@@ -1,5 +1,5 @@
-import createResponse from "../(functions)/create-response"
-import { supabase } from "../(functions)/db"
+import createResponse from "../../../function/create-response"
+import { supabase } from "../../../function/db"
 
 export async function GET() {
     const users = await supabase.from("user").select()
