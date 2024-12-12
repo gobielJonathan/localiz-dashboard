@@ -2,7 +2,7 @@ import createResponse from "@/function/create-response";
 import { supabase } from "@/function/db";
 import { registerSchema } from "@/schema/auth";
 import decrypt from "@/utils/decrypt";
-import tryCatch from "@/utils/try-catch";
+import { tryCatch } from "@/utils/try-catch";
 
 export async function POST(req: Request) {
     const body = await req.json()
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         })
     }
 
-    const { email, password: encryptedPassword, phone } = resultParsed.data
+    const { email, password: encryptedPassword, phone, name } = resultParsed.data
 
     //try to decrypt the password first
     const [errorDecryptPassword, password] = tryCatch(() => decrypt(encryptedPassword))
@@ -33,7 +33,11 @@ export async function POST(req: Request) {
     const { data, error: registerError } = await supabase.auth.signUp({
         email: email,
         password: password,
-        phone: phone
+        phone: phone,
+        options: {
+            emailRedirectTo: "/api/auth/callback",
+            data: { name: name }
+        }
     })
 
     if (registerError) {
@@ -43,6 +47,15 @@ export async function POST(req: Request) {
             error: registerError.message,
         })
     }
+
+    await supabase.from("users").insert({
+        user_id: data.user?.id,
+        data: JSON.stringify({
+            email: email,
+            phone: phone,
+            name: name
+        })
+    })
 
     return createResponse({
         type: "success",

@@ -12,70 +12,140 @@ export type Database = {
       dashboard: {
         Row: {
           created_at: string
-          created_by: number
+          created_by: string | null
           deleted_at: string | null
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          created_by: number
-          deleted_at?: string | null
-          id?: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: number
-          deleted_at?: string | null
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dashboard_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      invitation: {
-        Row: {
-          created_at: string
-          dashboard_id: string | null
           id: number
-          is_reject: boolean | null
-          note: string | null
-          user_id: number | null
+          name: string
         }
         Insert: {
           created_at?: string
-          dashboard_id?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
           id?: number
-          is_reject?: boolean | null
-          note?: string | null
-          user_id?: number | null
+          name: string
         }
         Update: {
           created_at?: string
-          dashboard_id?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
           id?: number
-          is_reject?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
+      invitations: {
+        Row: {
+          code: string
+          created_at: string
+          dashboard_id: number | null
+          deleted_at: string | null
+          id: number
+          invitation_by: string | null
+          invitation_to: string | null
+          is_accept: boolean | null
+          note: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          dashboard_id?: number | null
+          deleted_at?: string | null
+          id?: number
+          invitation_by?: string | null
+          invitation_to?: string | null
+          is_accept?: boolean | null
           note?: string | null
-          user_id?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          dashboard_id?: number | null
+          deleted_at?: string | null
+          id?: number
+          invitation_by?: string | null
+          invitation_to?: string | null
+          is_accept?: boolean | null
+          note?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "invitation_dashboard_id_fkey"
+            foreignKeyName: "invitations_dashboard_id_fkey"
             columns: ["dashboard_id"]
             isOneToOne: false
             referencedRelation: "dashboard"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      locale: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dashboard_id: number | null
+          deleted_at: string | null
+          id: number
+          locale: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dashboard_id?: number | null
+          deleted_at?: string | null
+          id?: number
+          locale?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dashboard_id?: number | null
+          deleted_at?: string | null
+          id?: number
+          locale?: string | null
+        }
+        Relationships: [
           {
-            foreignKeyName: "invitation_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "locale_dashboard_id_fkey"
+            columns: ["dashboard_id"]
             isOneToOne: false
-            referencedRelation: "user"
+            referencedRelation: "dashboard"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locale_content: {
+        Row: {
+          content: string | null
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: number
+          key: string | null
+          locale_id: number | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: number
+          key?: string | null
+          locale_id?: number | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: number
+          key?: string | null
+          locale_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locale_content_locale_id_fkey"
+            columns: ["locale_id"]
+            isOneToOne: false
+            referencedRelation: "locale"
             referencedColumns: ["id"]
           },
         ]
@@ -83,24 +153,24 @@ export type Database = {
       team: {
         Row: {
           created_at: string
-          dashboard_id: string | null
+          dashboard_id: number | null
           deleted_at: string | null
-          id: string
-          user_id: number | null
+          id: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string
-          dashboard_id?: string | null
+          dashboard_id?: number | null
           deleted_at?: string | null
-          id?: string
-          user_id?: number | null
+          id?: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string
-          dashboard_id?: string | null
+          dashboard_id?: number | null
           deleted_at?: string | null
-          id?: string
-          user_id?: number | null
+          id?: number
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -110,36 +180,26 @@ export type Database = {
             referencedRelation: "dashboard"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "team_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
         ]
       }
-      user: {
+      users: {
         Row: {
           created_at: string
-          deleted_at: string | null
-          email: string | null
+          data: string | null
           id: number
-          name: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
-          deleted_at?: string | null
-          email?: string | null
+          data?: string | null
           id?: number
-          name?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
-          deleted_at?: string | null
-          email?: string | null
+          data?: string | null
           id?: number
-          name?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
