@@ -3,6 +3,7 @@ import { Mail } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export default function View() {
   return (
@@ -43,13 +44,25 @@ export default function View() {
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
             <p className="text-sm text-muted-foreground">
-              Enter your email below to create your account
+              Enter your details below to create your account
             </p>
           </div>
           <div className="grid gap-6">
             <form>
-              <div className="grid gap-2">
+              <div className="grid gap-4">
                 <div className="grid gap-1">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="John Doe"
+                    type="text"
+                    autoCapitalize="words"
+                    autoComplete="name"
+                    autoCorrect="off"
+                  />
+                </div>
+                <div className="grid gap-1">
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     placeholder="name@example.com"
@@ -59,8 +72,28 @@ export default function View() {
                     autoCorrect="off"
                   />
                 </div>
+                <div className="grid gap-1">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    placeholder="••••••••"
+                    type="password"
+                    autoCapitalize="none"
+                    autoComplete="new-password"
+                  />
+                </div>
+                <div className="grid gap-1">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    placeholder="+1 (555) 000-0000"
+                    type="tel"
+                    autoCapitalize="none"
+                    autoComplete="tel"
+                  />
+                </div>
                 <Button className="w-full">
-                  Sign In with Email
+                  Sign Up
                 </Button>
               </div>
             </form>
@@ -76,8 +109,8 @@ export default function View() {
             </div>
             <Button variant="outline" className="w-full" asChild>
               <Link href="#">
-                <Mail className="mr-2 h-4 w-4" />
-                Google
+              <Mail className="mr-2 h-4 w-4" />
+              Google
               </Link>
             </Button>
           </div>
