@@ -1,9 +1,10 @@
-import Link from "next/link"
-import { Mail } from 'lucide-react'
+import Link from 'next/link';
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Mail } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function View() {
   return (
@@ -32,8 +33,8 @@ export default function View() {
         <div className="absolute bottom-12 left-12 right-12">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              "This library has saved me countless hours of work and helped me deliver stunning designs to my clients faster
-              than ever before."
+              "This library has saved me countless hours of work and helped me
+              deliver stunning designs to my clients faster than ever before."
             </p>
             <footer className="text-sm">Sofia Davis</footer>
           </blockquote>
@@ -42,7 +43,9 @@ export default function View() {
       <div className="flex items-center justify-center p-8">
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Create an account</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Create an account
+            </h1>
             <p className="text-sm text-muted-foreground">
               Enter your details below to create your account
             </p>
@@ -92,9 +95,7 @@ export default function View() {
                     autoComplete="tel"
                   />
                 </div>
-                <Button className="w-full">
-                  Sign Up
-                </Button>
+                <Button className="w-full">Sign Up</Button>
               </div>
             </form>
             <div className="relative">
@@ -109,28 +110,37 @@ export default function View() {
             </div>
             <Button variant="outline" className="w-full" asChild>
               <Link href="#">
-              <Mail className="mr-2 h-4 w-4" />
-              Google
+                <Mail className="mr-2 h-4 w-4" />
+                Google
               </Link>
             </Button>
           </div>
           <p className="px-8 text-center text-sm text-muted-foreground">
-            By clicking continue, you agree to our{" "}
-            <Link href="#" className="underline underline-offset-4 hover:text-primary">
+            By clicking continue, you agree to our{' '}
+            <Link
+              href="#"
+              className="underline underline-offset-4 hover:text-primary"
+            >
               Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link href="#" className="underline underline-offset-4 hover:text-primary">
+            </Link>{' '}
+            and{' '}
+            <Link
+              href="#"
+              className="underline underline-offset-4 hover:text-primary"
+            >
               Privacy Policy
             </Link>
             .
           </p>
         </div>
       </div>
-      <Button variant="ghost" className="absolute right-4 top-4 md:right-8 md:top-8" asChild>
+      <Button
+        variant="ghost"
+        className="absolute right-4 top-4 md:right-8 md:top-8"
+        asChild
+      >
         <Link href="#">Login</Link>
       </Button>
     </div>
-  )
+  );
 }
-
