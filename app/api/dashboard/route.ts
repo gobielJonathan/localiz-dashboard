@@ -1,25 +1,14 @@
 import createResponse from "@/function/create-response"
 import { supabase } from "@/function/db"
-import isInTeam from "@/middleware/is-in-team"
 import getAuthUser from "@/repository/auth/get-auth-user"
 import getUserDashboard from "@/repository/dashboard/get-user-dashboard"
 import { dashboardCreationSchema } from "@/schema/dashboard"
 import { asyncTryCatch } from "@/utils/try-catch"
 
-export async function GET(req: Request) {
-    const url = new URL(req.url)
-    const dashboardId = url.searchParams.get("id")
+export async function GET(_req: Request) {
+    const user = await getAuthUser()
 
-    const [hasInTeam, user] = await isInTeam(Number(dashboardId))
-    if (hasInTeam) {
-        return createResponse({
-            type: "failed",
-            error: "Please invite your account to dashboard",
-            status: 401
-        })
-    }
-
-    const [dashboardError, dashboards] = await getUserDashboard(user?.id || "")
+    const [dashboardError, dashboards] = await getUserDashboard(user.user.id || "")
     if (dashboardError) {
         return createResponse({
             type: "failed",
@@ -59,7 +48,7 @@ export async function POST(req: Request) {
         })
     }
 
-    const { data: dashboard, error: createDashboardError } = await supabase.from("dashboard").insert({ name: name, created_by: user?.user.id }).select().limit(1).single()
+    const { data: dashboard, error: createDashboardError } = await supabase.from("dashboard").insert({ name: name, created_by: user?.user.id }).select().single()
 
     const { data: team, error: createTeamError } = await supabase.from("team").insert({ dashboard_id: dashboard?.id, user_id: user?.user.id }).select()
 

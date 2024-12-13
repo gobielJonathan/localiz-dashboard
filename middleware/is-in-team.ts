@@ -10,8 +10,8 @@ export default async function isInTeam(dashboardId: number): Promise<[boolean, U
         return [false, user?.user]
     }
 
-    const isIncludedInTeam = await supabase.from("team").select("id").eq('dashboard_id', dashboardId).eq("user_id", user?.user.id || "")
-    if (isIncludedInTeam.count === 0) {
+    const inTeamResponse = await supabase.from("team").select("id").eq('dashboard_id', dashboardId).eq("user_id", user?.user.id || "")
+    if (inTeamResponse.data?.length == 0) {
         return [false, user?.user]
     }
 
