@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/constants/storage/auth';
-import createResponse from '@/function/create-response';
 import { supabase } from '@/function/db';
+import createResponse from '@/lib/create-response';
 
 export async function POST() {
   const logoutResponse = await supabase.auth.signOut();

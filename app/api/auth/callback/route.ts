@@ -1,15 +1,29 @@
-import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
-import { redirect } from "next/navigation";
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { NextRequest } from 'next/server';
+
+import { addSeconds } from 'date-fns';
 
 export async function GET(req: NextRequest) {
-    const urlSearchParam = new URLSearchParams(`?${req.nextUrl.hash.slice(1)}`)
+  const urlSearchParam = new URLSearchParams(`?${req.nextUrl.hash.slice(1)}`);
 
-    console.log('urlSearchParam.get("access_token") ', urlSearchParam.get("access_token"))
-    const cookieStore = await cookies()
+  const access_token = urlSearchParam.get('access_token') || '';
+  const refresh_token = urlSearchParam.get('refresh_token') || '';
+  const expires_in = Number(urlSearchParam.get('expires_in') || 1);
 
-    cookieStore.set('access_token', urlSearchParam.get("access_token") || "", { httpOnly: true });
-    cookieStore.set('refresh_token', urlSearchParam.get("refresh_token") || "", { httpOnly: true });
+  const expires = addSeconds(new Date(), expires_in);
 
-    return redirect("/")
+  const cookieStore = await cookies();
+  cookieStore.set('access_token', access_token, {
+    httpOnly: true,
+    expires: expires,
+    secure: true,
+  });
+  cookieStore.set('refresh_token', refresh_token, {
+    httpOnly: true,
+    expires: expires,
+    secure: true,
+  });
+
+  return redirect('/');
 }

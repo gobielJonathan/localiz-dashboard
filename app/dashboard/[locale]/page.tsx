@@ -28,7 +28,7 @@ export default async function Page() {
 
   return (
     <Client
-      teams={teams.data.map((team) => ({
+      dashboard={teams.data.map((team) => ({
         id: team.dashboard?.id ?? 0,
         name: team.dashboard?.name ?? '',
       }))}

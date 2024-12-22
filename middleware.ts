@@ -9,6 +9,7 @@ export async function middleware(req: NextRequest) {
 
   const refresh_token = cookiesStore.get('refresh_token')?.value ?? '';
   const access_token = cookiesStore.get('access_token')?.value ?? '';
+
   // Validate the token using Supabase
   const { data: user, error } = await supabase.auth.setSession({
     refresh_token: refresh_token,
@@ -17,7 +18,10 @@ export async function middleware(req: NextRequest) {
 
   // If token is invalid, redirect to the login page
   if (error || !user) {
-    return NextResponse.redirect(new URL('/login', req.url), { status: 301 });
+    return NextResponse.redirect(
+      new URL('/login?cb=' + req.nextUrl.href, req.url),
+      { status: 301 },
+    );
   }
 
   // Allow the request to continue if valid

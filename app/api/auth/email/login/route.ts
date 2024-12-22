@@ -1,8 +1,10 @@
 import { cookies } from 'next/headers';
 
+import { addSeconds } from 'date-fns';
+
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/constants/storage/auth';
-import createResponse from '@/function/create-response';
 import { supabase } from '@/function/db';
+import createResponse from '@/lib/create-response';
 import { loginSchema } from '@/schema/auth';
 import decrypt from '@/utils/decrypt';
 import { tryCatch } from '@/utils/try-catch';
@@ -48,14 +50,22 @@ export async function POST(req: Request) {
     });
   }
 
-  const { access_token, refresh_token, expires_at } = data.session;
+  const { access_token, refresh_token, expires_in } = data.session;
   const { id: user_id, email: user_email } = data.user;
 
   const cookieStore = await cookies();
 
-  cookieStore.set(ACCESS_TOKEN, data.session.access_token, { httpOnly: true });
-  cookieStore.set(REFRESH_TOKEN, data.session.refresh_token, {
+  const expires = addSeconds(new Date(), expires_in);
+
+  cookieStore.set(ACCESS_TOKEN, access_token, {
     httpOnly: true,
+    expires: expires,
+    secure: true,
+  });
+  cookieStore.set(REFRESH_TOKEN, refresh_token, {
+    httpOnly: true,
+    expires: expires,
+    secure: true,
   });
 
   return createResponse({
@@ -63,9 +73,6 @@ export async function POST(req: Request) {
     payload: {
       id: user_id,
       email: user_email,
-      access_token,
-      refresh_token,
-      expires_at,
     },
     status: 200,
   });
