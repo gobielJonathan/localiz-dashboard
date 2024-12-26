@@ -1,13 +1,16 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useForm } from '@tanstack/react-form';
 import { PlusCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 
 import useGetTeams from '@/app/dashboard/hooks/use-get-teams';
+import getInitials from '@/app/dashboard/utils/get-initial';
 import { AutoComplete } from '@/components/ui/autocomplete';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -26,11 +29,13 @@ import {
 } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import fetcher from '@/lib/fetch';
+import { asyncTryCatch } from '@/lib/try-catch';
 import { FormError } from '@/model/form';
-import { asyncTryCatch } from '@/utils/try-catch';
 
 export default function MemberList({ dashboardId }: { dashboardId: number }) {
   const { data: teams } = useGetTeams(dashboardId);
+
+  const [openInvitation, setOpenInvitation] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -65,6 +70,7 @@ export default function MemberList({ dashboardId }: { dashboardId: number }) {
           position: 'top-right',
         });
 
+        setOpenInvitation(false);
         return null;
       },
     },
@@ -91,9 +97,8 @@ export default function MemberList({ dashboardId }: { dashboardId: number }) {
       <div className="flex items-center space-x-2">
         {visibleTeamMembers.map((member) => (
           <Avatar key={member.id}>
-            <AvatarImage
-              src={`https://api.dicebear.com/6.x/initials/svg?seed=${member.name}`}
-            />
+            <AvatarImage src="" />
+            <AvatarFallback>{getInitials(member.users.email)}</AvatarFallback>
           </Avatar>
         ))}
         {additionalMembersCount > 0 && (
@@ -108,9 +113,10 @@ export default function MemberList({ dashboardId }: { dashboardId: number }) {
                 {teams.slice(3).map((member) => (
                   <div key={member.id} className="flex items-center space-x-2">
                     <Avatar>
-                      <AvatarImage
-                        src={`https://api.dicebear.com/6.x/initials/svg?seed=${member.name}`}
-                      />
+                      <AvatarImage src="" />
+                      <AvatarFallback>
+                        {getInitials(member.users.email)}
+                      </AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="font-medium">{member.users.email}</div>
@@ -125,7 +131,7 @@ export default function MemberList({ dashboardId }: { dashboardId: number }) {
           </Popover>
         )}
 
-        <Dialog>
+        <Dialog open={openInvitation} onOpenChange={setOpenInvitation}>
           <DialogTrigger asChild>
             <Button variant="outline" className="rounded-full w-10 h-10 p-0">
               <PlusCircle className="h-4 w-4" />

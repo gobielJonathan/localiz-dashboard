@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { asyncTryCatch } from '@/utils/try-catch';
+import { asyncTryCatch } from '@/lib/try-catch';
 
 import getInitials from '../utils/get-initial';
 

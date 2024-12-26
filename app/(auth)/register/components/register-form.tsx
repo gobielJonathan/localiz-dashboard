@@ -1,4 +1,4 @@
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import { Label } from '@radix-ui/react-label';
 import { useForm } from '@tanstack/react-form';
@@ -8,13 +8,15 @@ import FieldInfo from '@/components/form/FieldInfo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Loading from '@/components/ui/loading';
+import encrypt from '@/lib/encrypt';
 import fetcher from '@/lib/fetch';
+import { asyncTryCatch } from '@/lib/try-catch';
 import { FormError } from '@/model/form';
 import { registerSchema } from '@/schema/auth';
-import encrypt from '@/utils/encrypt';
-import { asyncTryCatch } from '@/utils/try-catch';
 
 export default function RegisterForm() {
+  const router = useRouter();
+
   const form = useForm({
     defaultValues: {
       email: '',
@@ -52,7 +54,7 @@ export default function RegisterForm() {
           { position: 'top-right' },
         );
 
-        router.push('/login');
+        router.replace('/login');
 
         return null;
       },

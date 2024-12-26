@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 
 import { Bell } from 'lucide-react';
 
@@ -11,28 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+
+import useGetNotification from '../hooks/use-get-notification';
 
 export function Notification() {
-  const [notifications] = useState([
-    {
-      id: 1,
-      title: 'New translation added',
-      description: 'A new key "welcome" was added to EN locale',
-      time: '2 min ago',
-    },
-    {
-      id: 2,
-      title: 'Team member invited',
-      description: 'New team member was invited to the project',
-      time: '1 hour ago',
-    },
-    {
-      id: 3,
-      title: 'System update',
-      description: 'Dashboard was updated to the latest version',
-      time: '2 hours ago',
-    },
-  ]);
+  const { data: notifications } = useGetNotification();
 
   return (
     <DropdownMenu>
@@ -60,6 +44,22 @@ export function Notification() {
             <div className="text-xs text-muted-foreground/60">
               {notification.time}
             </div>
+
+            {notification.actions && (
+              <div className="inline-flex space-x-4 ml-auto">
+                {notification.actions.map((action, idx) => (
+                  <Link key={idx} target="_blank" href={action.url}>
+                    <span
+                      className={cn({
+                        'bg-primary text-white p-2': action.type === 'primary',
+                      })}
+                    >
+                      {action.text}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
           </DropdownMenuItem>
         ))}
         {notifications.length === 0 && (

@@ -1,8 +1,8 @@
 import { supabase } from '@/function/db';
 import createResponse from '@/lib/create-response';
+import decrypt from '@/lib/decrypt';
+import { tryCatch } from '@/lib/try-catch';
 import { registerSchema } from '@/schema/auth';
-import decrypt from '@/utils/decrypt';
-import { tryCatch } from '@/utils/try-catch';
 
 export async function POST(req: Request) {
   const body = await req.json();

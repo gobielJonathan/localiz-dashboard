@@ -1,7 +1,7 @@
 import { supabase } from '@/function/db';
 import createResponse from '@/lib/create-response';
+import { asyncTryCatch } from '@/lib/try-catch';
 import getAuthUser from '@/repository/auth/get-auth-user';
-import { asyncTryCatch } from '@/utils/try-catch';
 
 export async function GET() {
   const [error, user] = await asyncTryCatch(() => getAuthUser());

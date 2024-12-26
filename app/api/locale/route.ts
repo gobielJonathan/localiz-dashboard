@@ -1,11 +1,13 @@
+import { NextRequest } from 'next/server';
+
 import { supabase } from '@/function/db';
 import createResponse from '@/lib/create-response';
 import safeParse from '@/lib/safe-parse';
 import isInTeam from '@/middleware/is-in-team';
 import { localeSchema } from '@/schema/locale';
 
-export async function GET(req: Request) {
-  const dashboardId = new URL(req.url).searchParams.get('dashboard_id');
+export async function GET(req: NextRequest) {
+  const dashboardId = req.nextUrl.searchParams.get('dashboard_id');
 
   const [hasInTeam] = await isInTeam(Number(dashboardId));
   if (!hasInTeam) {
@@ -50,7 +52,7 @@ export async function GET(req: Request) {
   });
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const body = await req.json();
 
   const localeSchemaParsed = localeSchema.safeParse(body);
@@ -62,7 +64,7 @@ export async function POST(req: Request) {
     });
   }
 
-  const { dashboard_id, locale } = localeSchemaParsed.data;
+  const { dashboard_id, locale, copy_from_locale } = localeSchemaParsed.data;
 
   const [hasInTeam, user] = await isInTeam(Number(dashboard_id));
   if (!hasInTeam) {
@@ -80,7 +82,26 @@ export async function POST(req: Request) {
       locale: locale,
       created_by: user?.id,
     })
-    .select();
+    .select()
+    .single();
+
+  //we sync between each locale, so we get previous locale to copy the locale content into the new one
+  if (copy_from_locale) {
+    const copiedLocaleContentKeys = await supabase
+      .from('locale_content')
+      .select('key')
+      .eq('locale_id', Number(copy_from_locale));
+
+    const cloneLocaleKey =
+      copiedLocaleContentKeys.data?.map((locale) => ({
+        locale_id: localeInsertResponse.data?.id ?? 0,
+        key: locale.key ?? '',
+        content: '',
+        created_by: user?.id ?? '',
+      })) ?? [];
+
+    await supabase.from('locale_content').upsert(cloneLocaleKey);
+  }
 
   if (localeInsertResponse.error) {
     return createResponse({

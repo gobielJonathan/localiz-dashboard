@@ -1,6 +1,6 @@
 import { openai } from '@/function/openai';
 import createResponse from '@/lib/create-response';
-import { asyncTryCatch } from '@/utils/try-catch';
+import { asyncTryCatch } from '@/lib/try-catch';
 
 export async function POST(req: Request) {
   const body = await req.json();

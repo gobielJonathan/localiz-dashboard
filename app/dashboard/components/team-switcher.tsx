@@ -41,7 +41,7 @@ export function TeamSwitcher({ teams }: Props) {
             >
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeTeam?.name}
+                  {activeTeam?.name ?? '-'}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />

@@ -6,10 +6,11 @@ import { supabase } from '@/function/db';
 import createResponse from '@/lib/create-response';
 import { handleInvitationSchema } from '@/schema/invitation';
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-
-  const handleInvitationSchemaParsed = handleInvitationSchema.safeParse(body);
+export async function GET(req: NextRequest) {
+  const handleInvitationSchemaParsed = handleInvitationSchema.safeParse({
+    code: req.nextUrl.searchParams.get('code'),
+    status: req.nextUrl.searchParams.get('status'),
+  });
 
   if (!handleInvitationSchemaParsed.success) {
     return createResponse({
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const { code, note, status } = handleInvitationSchemaParsed.data;
+  const { code, status } = handleInvitationSchemaParsed.data;
 
   let response: PostgrestSingleResponse<any> | undefined = undefined;
 
@@ -28,16 +29,17 @@ export async function POST(req: NextRequest) {
       .from('invitations')
       .update({
         is_accept: true,
-        note: note,
       })
       .eq('code', code)
       .is('is_accept', null)
       .select('dashboard_id, invitation_to');
 
-    await supabase.from('team').insert({
-      dashboard_id: response.data?.[0]?.dashboard_id,
-      user_id: response.data?.[0]?.invitation_to,
-    });
+    if (response.data) {
+      await supabase.from('team').insert({
+        dashboard_id: response.data[0]?.dashboard_id,
+        user_id: response.data[0]?.invitation_to,
+      });
+    }
   }
 
   if (status === 'decline') {
@@ -45,10 +47,10 @@ export async function POST(req: NextRequest) {
       .from('invitations')
       .update({
         is_accept: false,
-        note: note,
       })
       .eq('code', code)
-      .is('is_accept', null);
+      .is('is_accept', null)
+      .select('dashboard_id, invitation_to');
   }
 
   if (response?.error) {
@@ -56,14 +58,6 @@ export async function POST(req: NextRequest) {
       type: 'failed',
       status: response.status,
       error: response.error.message,
-    });
-  }
-
-  if (!response?.data) {
-    return createResponse({
-      type: 'failed',
-      error: 'data not found',
-      status: 404,
     });
   }
 

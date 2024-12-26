@@ -28,6 +28,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import UserProvider from '@/provider/user';
 
 import AddNewLocaleForm from '../components/forms/add-new-locale';
 import { Notification } from '../components/notification';
@@ -78,52 +79,54 @@ export default function DashboardLayout({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
-        <AppSidebar dashboard={dashboard} user={user} />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mr-2 h-4" />
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="/dashboard">
-                      Building Your Dashboard
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Localization List</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-            </div>
-            <div className="ml-auto mr-4">
-              <Notification />
-            </div>
-          </header>
-          {children}
+      <UserProvider defaultDashboardId={dashboard[0]?.id} userId={user.email}>
+        <SidebarProvider>
+          <AppSidebar dashboard={dashboard} user={user} />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem className="hidden md:block">
+                      <BreadcrumbLink href="/dashboard">
+                        Building Your Dashboard
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="hidden md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Localization List</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+              <div className="ml-auto mr-4">
+                <Notification />
+              </div>
+            </header>
+            {children}
 
-          <Dialog
-            open={isShowModalAddLocale}
-            onOpenChange={closeModalAddLocale}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Locale</DialogTitle>
-                <DialogDescription>
-                  Enter the name of the new locale you want to add.
-                </DialogDescription>
-              </DialogHeader>
-              <AddNewLocaleForm
-                defaultDashboardId={dashboard[0]?.id}
-                onSucess={onSuccessAddLocale}
-              />
-            </DialogContent>
-          </Dialog>
-        </SidebarInset>
-      </SidebarProvider>
+            <Dialog
+              open={isShowModalAddLocale}
+              onOpenChange={closeModalAddLocale}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Locale</DialogTitle>
+                  <DialogDescription>
+                    Enter the name of the new locale you want to add.
+                  </DialogDescription>
+                </DialogHeader>
+                <AddNewLocaleForm
+                  defaultDashboardId={dashboard[0]?.id}
+                  onSucess={onSuccessAddLocale}
+                />
+              </DialogContent>
+            </Dialog>
+          </SidebarInset>
+        </SidebarProvider>
+      </UserProvider>
     </QueryClientProvider>
   );
 }

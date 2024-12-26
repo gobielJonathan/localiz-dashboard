@@ -1,23 +1,38 @@
-import { use, useMemo, useState } from 'react';
+import { useRef, useState } from 'react';
 
-import { useMutation } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 import useGetLocaleContent, {
   NormalizedGetLocaleContent,
 } from '@/app/dashboard/hooks/use-get-locale-content';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/data-table';
 import { DataTableLoader } from '@/components/ui/data-table/loader';
-import Loading from '@/components/ui/loading';
 import {
-  Popover,
-  PopoverClose,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import fetcher from '@/lib/fetch';
+import { asyncTryCatch } from '@/lib/try-catch';
+
+import UpdateContentForm from '../form/update-key-content';
 
 export default function LocaleList({
   dashboardId,
@@ -26,17 +41,10 @@ export default function LocaleList({
   dashboardId: number;
   locale: string;
 }) {
-  const {
-    mutateAsync: deleteLocaleContent,
-    isPending: loadingDeleteLocaleContent,
-  } = useMutation({
-    mutationFn: (vars: any) =>
-      fetcher(`/api/locale/content?id=${vars.id}&dashboard_id=${dashboardId}`, {
-        method: 'DELETE',
-      }),
-  });
-
-  const [deletedKey, setDeletedKey] = useState<number | undefined>(undefined);
+  const [editedData, setEditedData] = useState<{
+    key: string;
+    content: string;
+  }>({ key: '', content: '' });
 
   const {
     data,
@@ -45,64 +53,113 @@ export default function LocaleList({
   } = useGetLocaleContent(dashboardId, String(locale));
 
   const onDeleteLocaleContent = async (id: number) => {
-    await deleteLocaleContent(
-      { id },
-      {
-        onError: (error) => {
-          toast.error(error.message, { position: 'top-right' });
-        },
-        onSuccess: () => {
-          toast.success('Locale content deleted', { position: 'top-right' });
-          setDeletedKey(undefined);
-          refetchGetLocaleContent();
-        },
-      },
+    const [error] = await asyncTryCatch(() =>
+      fetcher(`/api/locale/content?id=${id}&dashboard_id=${dashboardId}`, {
+        method: 'DELETE',
+      }),
     );
+
+    if (error) {
+      toast.error(error.message, { position: 'top-right' });
+      return;
+    }
+    toast.success('Locale content deleted', { position: 'top-right' });
+    refetchGetLocaleContent();
   };
 
-  const columns: ColumnDef<NormalizedGetLocaleContent>[] = useMemo(
-    () => [
-      {
-        accessorKey: 'key',
-        header: 'Key',
-      },
-      {
-        accessorKey: 'content',
-        header: 'Content',
-      },
-      {
-        id: 'actions',
-        enableHiding: false,
-        cell: ({ row }) => {
-          const content: NormalizedGetLocaleContent = row.original;
+  const columns: ColumnDef<NormalizedGetLocaleContent>[] = [
+    {
+      accessorKey: 'key',
+      header: 'Key',
+    },
+    {
+      accessorKey: 'content',
+      header: 'Content',
+    },
 
-          return (
+    {
+      accessorKey: 'info',
+      header: 'Info',
+      cell: ({ row }) => {
+        const content: NormalizedGetLocaleContent = row.original;
+        return (
+          <div key={content.id}>
+            <div>Created by: {content.users.email}</div>
             <div>
-              <Popover open={content.id === deletedKey}>
-                <PopoverTrigger onClick={() => setDeletedKey(content.id)}>
+              Created at: {format(content.created_at, 'dd MMM yyyy, HH:mm')}
+            </div>
+          </div>
+        );
+      },
+    },
+
+    {
+      id: 'actions',
+      enableHiding: false,
+      cell: ({ row }) => {
+        const content: NormalizedGetLocaleContent = row.original;
+
+        return (
+          <div className="flex flex-col space-y-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setEditedData({
+                      content: content.content,
+                      key: content.key,
+                    });
+                  }}
+                >
+                  Edit
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Edit Content</DialogTitle>
+                  <DialogDescription>
+                    Make changes to your content here. Click save when you're
+                    done.
+                  </DialogDescription>
+                </DialogHeader>
+                <UpdateContentForm
+                  dashboardId={String(dashboardId)}
+                  defaultData={editedData}
+                  onSuccess={console.log}
+                />
+              </DialogContent>
+            </Dialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="outline">
                   Delete
-                </PopoverTrigger>
-                <PopoverContent className="w-fit space-x-2">
-                  <Button
-                    variant="default"
-                    size="sm"
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your account and remove your data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
                     onClick={() => onDeleteLocaleContent(content.id)}
                   >
-                    {loadingDeleteLocaleContent && <Loading />}
-                    Confirm
-                  </Button>
-                  <PopoverClose onClick={() => setDeletedKey(undefined)}>
-                    Cancel
-                  </PopoverClose>
-                </PopoverContent>
-              </Popover>
-            </div>
-          );
-        },
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        );
       },
-    ],
-    [deletedKey, loadingDeleteLocaleContent],
-  );
+    },
+  ];
 
   if (isLoading) {
     return <DataTableLoader />;

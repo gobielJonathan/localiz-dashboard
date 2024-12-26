@@ -1,19 +1,26 @@
-import { User } from "@supabase/supabase-js";
-import { supabase } from "@/function/db";
-import getAuthUser from "@/repository/auth/get-auth-user";
-import { asyncTryCatch } from "@/utils/try-catch";
+import { User } from '@supabase/supabase-js';
 
-export default async function isInTeam(dashboardId: number): Promise<[boolean, User | undefined]> {
-    const [error, user] = await asyncTryCatch(() => getAuthUser())
+import { supabase } from '@/function/db';
+import { asyncTryCatch } from '@/lib/try-catch';
+import getAuthUser from '@/repository/auth/get-auth-user';
 
-    if (error) {
-        return [false, user?.user]
-    }
+export default async function isInTeam(
+  dashboardId: number,
+): Promise<[boolean, User | undefined]> {
+  const [error, user] = await asyncTryCatch(() => getAuthUser());
 
-    const inTeamResponse = await supabase.from("team").select("id").eq('dashboard_id', dashboardId).eq("user_id", user?.user.id || "")
-    if (inTeamResponse.data?.length == 0) {
-        return [false, user?.user]
-    }
+  if (error) {
+    return [false, user?.user];
+  }
 
-    return [true, user?.user]
+  const inTeamResponse = await supabase
+    .from('team')
+    .select('id')
+    .eq('dashboard_id', dashboardId)
+    .eq('user_id', user?.user.id || '');
+  if (inTeamResponse.data?.length == 0) {
+    return [false, user?.user];
+  }
+
+  return [true, user?.user];
 }

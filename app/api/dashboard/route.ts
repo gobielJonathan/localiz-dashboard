@@ -1,11 +1,11 @@
 import { supabase } from '@/function/db';
 import createResponse from '@/lib/create-response';
+import { asyncTryCatch } from '@/lib/try-catch';
 import getAuthUser from '@/repository/auth/get-auth-user';
 import getUserDashboard from '@/repository/dashboard/get-user-dashboard';
 import { dashboardCreationSchema } from '@/schema/dashboard';
-import { asyncTryCatch } from '@/utils/try-catch';
 
-export async function GET(_req: Request) {
+export async function GET() {
   const user = await getAuthUser();
 
   const [dashboardError, dashboards] = await getUserDashboard(

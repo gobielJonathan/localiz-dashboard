@@ -26,6 +26,19 @@ export async function POST(req: Request) {
     });
   }
 
+  const inTeamResponse = await supabase
+    .from('team')
+    .select('id')
+    .eq('dashboard_id', dashboard_id)
+    .eq('user_id', invitation_to);
+  if (inTeamResponse.data?.length == 1) {
+    return createResponse({
+      type: 'failed',
+      error: 'User already in team',
+      status: 400,
+    });
+  }
+
   const invitationResponse = await supabase
     .from('users')
     .select('id')

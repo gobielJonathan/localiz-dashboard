@@ -7,9 +7,7 @@ export interface NormalizedGetLocaleContent {
   created_at: string;
   key: string;
   content: string;
-  locale_id: number;
-  deleted_at: any;
-  created_by: string;
+  users: { email: string };
 }
 
 export default function useGetLocaleContent(

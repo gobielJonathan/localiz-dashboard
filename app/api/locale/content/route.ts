@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
 
   const localeResponse = await supabase
     .from('locale_content')
-    .select()
+    .select('id, created_at, key, content, users ( email )')
     .eq('locale_id', locale);
 
   if (localeResponse.error) {
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
       locale_id: Number(locale_id),
       content: content,
       key: key,
-      created_by: user?.id,
+      created_by: user?.id ?? '',
     })
     .select()
     .single();

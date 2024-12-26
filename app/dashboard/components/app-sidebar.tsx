@@ -46,66 +46,42 @@ export function AppSidebar(props: Props) {
     return `/dashboard/${locale}?${searchParams.toString()}`;
   };
 
-  const navItems = useMemo(() => {
-    return [
-      {
-        title: 'Locales',
-        url: '#',
-        icon: Globe,
-        items: locales.map((locale) => ({
-          title: locale.locale,
-          url: generateLocaleLink(locale.id.toString()),
-        })),
-        suffix: (
-          <div
-            className="w-6"
-            onClick={(e) => {
-              e.stopPropagation();
-              const url = new URL(window.location.href);
-              url.searchParams.set('modal', 'add_locale');
-              router.replace(url.toString());
-            }}
-          >
-            <Plus className="h-4 w-4" />
-          </div>
-        ),
-      },
-      {
-        title: 'Documentation',
-        url: '#',
-        icon: BookOpen,
-        items: [
-          {
-            title: 'Introduction',
-            url: '#',
-          },
-          {
-            title: 'Get Started',
-            url: '#',
-          },
-          {
-            title: 'Tutorials',
-            url: '#',
-          },
-          {
-            title: 'Changelog',
-            url: '#',
-          },
-        ],
-      },
-      {
-        title: 'Settings',
-        url: '#',
-        icon: Settings2,
-        items: [
-          {
-            title: 'Team',
-            url: '#',
-          },
-        ],
-      },
-    ];
-  }, [locales, router]);
+  const navItems = [
+    {
+      title: 'Locales',
+      url: '#',
+      icon: Globe,
+      items: locales.map((locale) => ({
+        title: locale.locale,
+        url: generateLocaleLink(locale.id.toString()),
+      })),
+      isActive: true,
+      suffix: (
+        <div
+          className="w-6"
+          onClick={(e) => {
+            e.stopPropagation();
+            const url = new URL(window.location.href);
+            url.searchParams.set('modal', 'add_locale');
+            router.replace(url.toString());
+          }}
+        >
+          <Plus className="h-4 w-4" />
+        </div>
+      ),
+    },
+    {
+      title: 'Settings',
+      url: '#',
+      icon: Settings2,
+      items: [
+        {
+          title: 'Team',
+          url: '/dashboard/teams',
+        },
+      ],
+    },
+  ];
 
   return (
     <Sidebar collapsible="icon">

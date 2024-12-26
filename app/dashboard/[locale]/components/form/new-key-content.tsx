@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import fetcher from '@/lib/fetch';
+import { asyncTryCatch } from '@/lib/try-catch';
 import { FormError } from '@/model/form';
 import { localeContentSchema } from '@/schema/locale';
-import { asyncTryCatch } from '@/utils/try-catch';
 
 export default function NewKeyContentForm(props: {
   dashboardId: number;
