@@ -1,6 +1,8 @@
 'use client';
 
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useCallback } from 'react';
+
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -13,12 +15,22 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+
+import AddNewLocaleForm from '../components/forms/add-new-locale';
+import { Notification } from '../components/notification';
 
 const queryClient = new QueryClient();
 
@@ -42,6 +54,28 @@ export default function DashboardLayout({
   user,
   children,
 }: PropsWithChildren<Props>) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const isShowModalAddLocale = searchParams.get('modal') === 'add_locale';
+
+  const closeModalAddLocale = useCallback(
+    (open: boolean) => {
+      if (open) return;
+
+      const urlSearchParams = new URLSearchParams(searchParams.toString());
+      urlSearchParams.delete('modal');
+      router.replace(`${pathname}?${urlSearchParams.toString()}`);
+    },
+    [router, pathname, searchParams],
+  );
+
+  const onSuccessAddLocale = useCallback(() => {
+    closeModalAddLocale(false);
+    router.refresh();
+  }, [router, closeModalAddLocale]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
@@ -54,19 +88,40 @@ export default function DashboardLayout({
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      Building Your Application
+                    <BreadcrumbLink href="/dashboard">
+                      Building Your Dashboard
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                    <BreadcrumbPage>Localization List</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
+            <div className="ml-auto mr-4">
+              <Notification />
+            </div>
           </header>
           {children}
+
+          <Dialog
+            open={isShowModalAddLocale}
+            onOpenChange={closeModalAddLocale}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Locale</DialogTitle>
+                <DialogDescription>
+                  Enter the name of the new locale you want to add.
+                </DialogDescription>
+              </DialogHeader>
+              <AddNewLocaleForm
+                defaultDashboardId={dashboard[0]?.id}
+                onSucess={onSuccessAddLocale}
+              />
+            </DialogContent>
+          </Dialog>
         </SidebarInset>
       </SidebarProvider>
     </QueryClientProvider>

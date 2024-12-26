@@ -1,12 +1,15 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useMemo } from 'react';
 
-import { BookOpen, Settings2, SquareTerminal } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+import { BookOpen, Globe, Plus, Settings2, SquareTerminal } from 'lucide-react';
 
 import { NavMain } from '@/app/dashboard/components/nav-main';
 import { NavUser } from '@/app/dashboard/components/nav-user';
 import { TeamSwitcher } from '@/app/dashboard/components/team-switcher';
+import { Button } from '@/components/ui/button';
 import {
   Sidebar,
   SidebarContent,
@@ -27,59 +30,13 @@ interface Dashboard {
   id: number;
 }
 
-const generateNavMainProps = ({
-  locales,
-}: {
-  locales: { title: string; url: string }[];
-}) => [
-  {
-    title: 'Locales',
-    url: '#',
-    icon: SquareTerminal,
-    items: locales,
-  },
-  {
-    title: 'Documentation',
-    url: '#',
-    icon: BookOpen,
-    items: [
-      {
-        title: 'Introduction',
-        url: '#',
-      },
-      {
-        title: 'Get Started',
-        url: '#',
-      },
-      {
-        title: 'Tutorials',
-        url: '#',
-      },
-      {
-        title: 'Changelog',
-        url: '#',
-      },
-    ],
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: Settings2,
-    items: [
-      {
-        title: 'Team',
-        url: '#',
-      },
-    ],
-  },
-];
-
 interface Props {
   user: User;
   dashboard: Dashboard[];
 }
 
 export function AppSidebar(props: Props) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const dashboardId = searchParams.get('id') ?? props.dashboard[0]?.id;
 
@@ -89,20 +46,74 @@ export function AppSidebar(props: Props) {
     return `/dashboard/${locale}?${searchParams.toString()}`;
   };
 
+  const navItems = useMemo(() => {
+    return [
+      {
+        title: 'Locales',
+        url: '#',
+        icon: Globe,
+        items: locales.map((locale) => ({
+          title: locale.locale,
+          url: generateLocaleLink(locale.id.toString()),
+        })),
+        suffix: (
+          <div
+            className="w-6"
+            onClick={(e) => {
+              e.stopPropagation();
+              const url = new URL(window.location.href);
+              url.searchParams.set('modal', 'add_locale');
+              router.replace(url.toString());
+            }}
+          >
+            <Plus className="h-4 w-4" />
+          </div>
+        ),
+      },
+      {
+        title: 'Documentation',
+        url: '#',
+        icon: BookOpen,
+        items: [
+          {
+            title: 'Introduction',
+            url: '#',
+          },
+          {
+            title: 'Get Started',
+            url: '#',
+          },
+          {
+            title: 'Tutorials',
+            url: '#',
+          },
+          {
+            title: 'Changelog',
+            url: '#',
+          },
+        ],
+      },
+      {
+        title: 'Settings',
+        url: '#',
+        icon: Settings2,
+        items: [
+          {
+            title: 'Team',
+            url: '#',
+          },
+        ],
+      },
+    ];
+  }, [locales, router]);
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <TeamSwitcher teams={props.dashboard} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain
-          items={generateNavMainProps({
-            locales: locales.map((locale) => ({
-              title: locale.locale,
-              url: generateLocaleLink(locale.id.toString()),
-            })),
-          })}
-        />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={props.user} />

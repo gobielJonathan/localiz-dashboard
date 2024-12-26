@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
 
 export interface NormalizedGetLocaleContent {
@@ -14,7 +16,7 @@ export default function useGetLocaleContent(
   dashboardId: number,
   locale: string,
 ) {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['locale_content', locale, dashboardId],
     queryFn: () =>
       fetch(
@@ -22,9 +24,13 @@ export default function useGetLocaleContent(
       ).then((res) => res.json()),
   });
 
-  return {
-    data: (data?.data ?? []) as NormalizedGetLocaleContent[],
-    isLoading,
-    error,
-  };
+  return useMemo(
+    () => ({
+      data: (data?.data ?? []) as NormalizedGetLocaleContent[],
+      isLoading,
+      error,
+      refetch,
+    }),
+    [data, isLoading, error, refetch],
+  );
 }

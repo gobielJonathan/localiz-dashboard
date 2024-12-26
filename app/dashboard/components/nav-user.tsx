@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -28,6 +28,8 @@ export function NavUser({
     email: string;
   };
 }) {
+  const router = useRouter();
+
   const { isMobile } = useSidebar();
 
   const onLogout = async () => {
@@ -77,7 +79,7 @@ export function NavUser({
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuItem onClick={onLogout}>
+            <DropdownMenuItem onClick={() => router.push('/setting')}>
               <Settings />
               Settings
             </DropdownMenuItem>

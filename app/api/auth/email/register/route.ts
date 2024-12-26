@@ -51,7 +51,8 @@ export async function POST(req: Request) {
   }
 
   await supabase.from('users').insert({
-    user_id: data.user?.id,
+    user_id: data.user?.id ?? '',
+    email: email,
     data: JSON.stringify({
       email: email,
       phone: phone,

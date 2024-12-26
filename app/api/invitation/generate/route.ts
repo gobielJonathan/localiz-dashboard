@@ -17,6 +17,15 @@ export async function POST(req: Request) {
 
   const { dashboard_id, note, invitation_to } = invitationSchemaParsed.data;
 
+  const loggedInUser = await getAuthUser();
+  if (invitation_to === loggedInUser.user.id) {
+    return createResponse({
+      type: 'failed',
+      error: 'You cannot invite yourself',
+      status: 400,
+    });
+  }
+
   const invitationResponse = await supabase
     .from('users')
     .select('id')
@@ -42,13 +51,17 @@ export async function POST(req: Request) {
 
   const user = await getAuthUser();
 
-  const insertedInvitation = await supabase.from('invitations').insert({
-    code: randomCode,
-    dashboard_id: dashboard_id,
-    invitation_by: user.user.id,
-    invitation_to: invitation_to,
-    note: note,
-  });
+  const insertedInvitation = await supabase
+    .from('invitations')
+    .insert({
+      code: randomCode,
+      dashboard_id: dashboard_id,
+      invitation_by: user.user.id,
+      invitation_to: invitation_to,
+      note: note,
+    })
+    .select('id, code')
+    .single();
 
   if (insertedInvitation.error) {
     return createResponse({

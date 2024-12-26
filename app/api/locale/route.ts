@@ -2,7 +2,6 @@ import { supabase } from '@/function/db';
 import createResponse from '@/lib/create-response';
 import safeParse from '@/lib/safe-parse';
 import isInTeam from '@/middleware/is-in-team';
-import getAuthUser from '@/repository/auth/get-auth-user';
 import { localeSchema } from '@/schema/locale';
 
 export async function GET(req: Request) {

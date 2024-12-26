@@ -117,8 +117,9 @@ export default function Onboarding() {
                     <ChevronRight className="w-4 h-4 ml-1 inline-block" />
                   </Button>
                   <Button
-                    className="bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+                    className="bg-gray-900 text-white hover:bg-gray-800 transition-colors z-[1]"
                     size="lg"
+                    onClick={() => router.push('/setting')}
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Settings

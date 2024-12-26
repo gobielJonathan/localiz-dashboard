@@ -5,6 +5,38 @@ import createResponse from '@/lib/create-response';
 import isInTeam from '@/middleware/is-in-team';
 import { localeContentSchema } from '@/schema/locale';
 
+export async function DELETE(req: NextRequest) {
+  const id = req.nextUrl.searchParams.get('id');
+  const dashboardId = req.nextUrl.searchParams.get('dashboard_id') || '';
+
+  const [hasInTeam] = await isInTeam(Number(dashboardId));
+  if (!hasInTeam) {
+    return createResponse({
+      type: 'failed',
+      error: 'Please invite your account to dashboard',
+      status: 401,
+    });
+  }
+
+  const deletedResponse = await supabase
+    .from('locale_content')
+    .delete()
+    .eq('id', Number(id));
+  if (deletedResponse.error) {
+    return createResponse({
+      type: 'failed',
+      error: deletedResponse.error.message,
+      status: deletedResponse.status,
+    });
+  }
+
+  return createResponse({
+    type: 'success',
+    payload: deletedResponse.data,
+    status: 200,
+  });
+}
+
 export async function GET(req: NextRequest) {
   const dashboardId = req.nextUrl.searchParams.get('dashboard_id') || '';
   const locale = req.nextUrl.searchParams.get('locale') || '';
@@ -38,7 +70,7 @@ export async function GET(req: NextRequest) {
   });
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const body = await req.json();
 
   const localeContentSchemaParsed = localeContentSchema.safeParse(body);
@@ -50,8 +82,18 @@ export async function POST(req: Request) {
     });
   }
 
-  const { content, key, locale_id, dashboard_id } =
-    localeContentSchemaParsed.data;
+  const locale_id = req.nextUrl.searchParams.get('locale_id') || '';
+  const dashboard_id = req.nextUrl.searchParams.get('dashboard_id') || '';
+
+  if (!locale_id || !dashboard_id) {
+    return createResponse({
+      type: 'failed',
+      error: 'locale_id and dashboard_id are required',
+      status: 500,
+    });
+  }
+
+  const { content, key } = localeContentSchemaParsed.data;
 
   const [hasInTeam, user] = await isInTeam(Number(dashboard_id));
   if (!hasInTeam) {
@@ -65,12 +107,13 @@ export async function POST(req: Request) {
   const localeContentInsertResponse = await supabase
     .from('locale_content')
     .insert({
-      locale_id: locale_id,
+      locale_id: Number(locale_id),
       content: content,
       key: key,
       created_by: user?.id,
     })
-    .select();
+    .select()
+    .single();
 
   if (localeContentInsertResponse.error) {
     return createResponse({
