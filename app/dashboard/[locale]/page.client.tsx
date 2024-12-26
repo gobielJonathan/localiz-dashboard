@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 
 import { Plus } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -18,14 +19,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 import DashboardLayout from '../layout';
+import NewKeyContentForm from './components/form/new-key-content';
 import LocaleList from './components/locale-list';
 import MemberList from './components/member-list';
 
@@ -44,25 +43,25 @@ interface Props {
 }
 
 export default function Client({ dashboard, user }: Props) {
+  const { locale } = useParams();
+
   const searchParams = useSearchParams();
   const dashboardId = searchParams.get('id') ?? dashboard[0]?.id;
 
-  const { locale } = useParams();
-
   const [showAddKeyDialog, setShowAddKeyDialog] = useState(false);
 
-  const handleUpdateContent = (key: string, newContent: string) => {};
-
-  const handleDeleteKey = (key: string) => {};
-
-  const handleInvite = () => {};
-
-  const handleAddKey = () => {
+  const onSuccessSubmit = () => {
+    toast.success('Key added successfully');
     setShowAddKeyDialog(false);
+  };
+
+  const onFailSubmit = (error: Error) => {
+    toast.error(error.message);
   };
 
   return (
     <>
+      <Toaster />
       <DashboardLayout dashboard={dashboard} user={user}>
         <Card className="flex-grow border-none">
           <CardHeader>
@@ -86,43 +85,24 @@ export default function Client({ dashboard, user }: Props) {
             <MemberList dashboardId={Number(dashboardId)} />
           </CardContent>
         </Card>
-      </DashboardLayout>
 
-      <Dialog open={showAddKeyDialog} onOpenChange={setShowAddKeyDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Localization Key</DialogTitle>
-            <DialogDescription>
-              Enter the new key and its content for the current locale.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="newKey" className="text-right">
-                Key
-              </Label>
-              <Input
-                id="newKey"
-                placeholder="e.g., welcome_message"
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="newContent" className="text-right">
-                Content
-              </Label>
-              <Input
-                id="newContent"
-                placeholder="Enter the localized content"
-                className="col-span-3"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={handleAddKey}>Add Key</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <Dialog open={showAddKeyDialog} onOpenChange={setShowAddKeyDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Localization Key</DialogTitle>
+              <DialogDescription>
+                Enter the new key and its content for the current locale.
+              </DialogDescription>
+            </DialogHeader>
+
+            <NewKeyContentForm
+              dashboardId={Number(dashboardId)}
+              onSuccess={onSuccessSubmit}
+              onError={onFailSubmit}
+            />
+          </DialogContent>
+        </Dialog>
+      </DashboardLayout>
     </>
   );
 }
