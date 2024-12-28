@@ -44,5 +44,6 @@ export const config = {
      * @note page section
      */
     '/dashboard/:path*',
+    '/setting',
   ],
 };

@@ -78,7 +78,7 @@ export default function MemberList({ dashboardId }: { dashboardId: number }) {
 
   const onSearchMember = async (text: string) => {
     const [error, response] = await asyncTryCatch(() =>
-      fetcher(`/api/auth/suggestion?text=${text}`),
+      fetcher(`/api/user/suggestion?text=${text}`),
     );
     if (error) return [];
 

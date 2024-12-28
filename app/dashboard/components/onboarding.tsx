@@ -108,14 +108,14 @@ export default function Onboarding() {
                     phone number etc
                   </CardDescription>
                 </CardHeader>
-                <CardFooter className="flex justify-between items-center pt-4">
-                  <Button
+                <CardFooter className="flex justify-end items-center pt-4">
+                  {/* <Button
                     variant="link"
                     className="text-purple-600 p-0 hover:text-purple-700 transition-colors"
                   >
                     Learn more{' '}
                     <ChevronRight className="w-4 h-4 ml-1 inline-block" />
-                  </Button>
+                  </Button> */}
                   <Button
                     className="bg-gray-900 text-white hover:bg-gray-800 transition-colors z-[1]"
                     size="lg"
@@ -142,14 +142,14 @@ export default function Onboarding() {
                     effortlessly!
                   </CardDescription>
                 </CardHeader>
-                <CardFooter className="flex justify-between items-center pt-4">
-                  <Button
+                <CardFooter className="flex justify-end items-center pt-4">
+                  {/* <Button
                     variant="link"
                     className="text-blue-600 p-0 hover:text-blue-700 transition-colors"
                   >
                     Learn more{' '}
                     <ChevronRight className="w-4 h-4 ml-1 inline-block" />
-                  </Button>
+                  </Button> */}
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
