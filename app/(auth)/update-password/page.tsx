@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { useForm } from '@tanstack/react-form';
 import toast, { Toaster } from 'react-hot-toast';
 import * as z from 'zod';
@@ -32,8 +30,6 @@ const formSchema = z
   });
 
 export default function UpdatePasswordPage() {
-  const router = useRouter();
-
   const form = useForm({
     defaultValues: {
       confirmPassword: '',
@@ -65,7 +61,7 @@ export default function UpdatePasswordPage() {
           return;
         }
 
-        router.replace('/dashboard');
+        window.location.assign('/dashboard');
         return null;
       },
     },

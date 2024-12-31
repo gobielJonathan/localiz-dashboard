@@ -42,7 +42,6 @@ export async function middleware(req: NextRequest) {
   }
 
   if (req.nextUrl.pathname.startsWith('/api')) {
-    console.log('checking');
     const decision = await aj.protect(req, {
       userId: user.user?.id ?? '',
       requested: 5,

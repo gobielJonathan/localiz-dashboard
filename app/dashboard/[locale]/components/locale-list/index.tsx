@@ -1,38 +1,16 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import toast from 'react-hot-toast';
 
 import useGetLocaleContent, {
   NormalizedGetLocaleContent,
 } from '@/app/dashboard/hooks/use-get-locale-content';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/data-table';
 import { DataTableLoader } from '@/components/ui/data-table/loader';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import fetcher from '@/lib/fetch';
-import { asyncTryCatch } from '@/lib/try-catch';
 
-import UpdateContentForm from '../form/update-key-content';
+import DeleteLocaleDialog from '../dialog/delete-locale';
+import EditLocaleDialog from '../dialog/edit-locale';
 
 export default function LocaleList({
   dashboardId,
@@ -46,26 +24,7 @@ export default function LocaleList({
     content: string;
   }>({ key: '', content: '' });
 
-  const {
-    data,
-    isLoading,
-    refetch: refetchGetLocaleContent,
-  } = useGetLocaleContent(dashboardId, String(locale));
-
-  const onDeleteLocaleContent = async (id: number) => {
-    const [error] = await asyncTryCatch(() =>
-      fetcher(`/api/locale/content?id=${id}&dashboard_id=${dashboardId}`, {
-        method: 'DELETE',
-      }),
-    );
-
-    if (error) {
-      toast.error(error.message, { position: 'top-right' });
-      return;
-    }
-    toast.success('Locale content deleted', { position: 'top-right' });
-    refetchGetLocaleContent();
-  };
+  const { data, isLoading } = useGetLocaleContent(dashboardId, String(locale));
 
   const columns: ColumnDef<NormalizedGetLocaleContent>[] = [
     {
@@ -101,60 +60,16 @@ export default function LocaleList({
 
         return (
           <div className="flex flex-col space-y-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    setEditedData({
-                      content: content.content,
-                      key: content.key,
-                    });
-                  }}
-                >
-                  Edit
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Edit Content</DialogTitle>
-                  <DialogDescription>
-                    Make changes to your content here. Click save when you're
-                    done.
-                  </DialogDescription>
-                </DialogHeader>
-                <UpdateContentForm
-                  dashboardId={String(dashboardId)}
-                  defaultData={editedData}
-                  onSuccess={console.log}
-                />
-              </DialogContent>
-            </Dialog>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button size="sm" variant="outline">
-                  Delete
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your account and remove your data from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => onDeleteLocaleContent(content.id)}
-                  >
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <EditLocaleDialog
+              dashboardId={dashboardId}
+              locale={locale}
+              data={content}
+            />
+            <DeleteLocaleDialog
+              dashboardId={dashboardId}
+              locale={locale}
+              id={content.id}
+            />
           </div>
         );
       },

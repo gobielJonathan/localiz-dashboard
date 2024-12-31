@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useForm } from '@tanstack/react-form';
@@ -12,6 +13,8 @@ import fetcher from '@/lib/fetch';
 import { asyncTryCatch } from '@/lib/try-catch';
 import { FormError } from '@/model/form';
 import { loginSchema } from '@/schema/auth';
+
+import ForgotPassword from './forgot-password';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -52,64 +55,85 @@ export default function LoginForm() {
   });
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        form.handleSubmit();
-      }}
-    >
-      <div className="grid gap-2">
-        <form.Field
-          name="email"
-          children={(field) => (
-            <div className="grid gap-1">
-              <Input
-                id={field.name}
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="name@example.com"
-                type="email"
-                autoCapitalize="none"
-                autoComplete="email"
-                autoCorrect="off"
-              />
-              <FieldInfo field={field} />
-            </div>
-          )}
-        />
+    <>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
+        <div className="grid gap-2">
+          <form.Field
+            name="email"
+            children={(field) => (
+              <div className="grid gap-1">
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="name@example.com"
+                  type="email"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  autoCorrect="off"
+                />
+                <FieldInfo field={field} />
+              </div>
+            )}
+          />
 
-        <form.Field
-          name="password"
-          children={(field) => (
-            <div className="grid gap-1">
-              <Input
-                id={field.name}
-                name={field.name}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-                placeholder="Password"
-                type="password"
-                autoCapitalize="none"
-                autoComplete="email"
-                autoCorrect="off"
-              />
-              <FieldInfo field={field} />
-            </div>
-          )}
-        />
+          <form.Field
+            name="password"
+            children={(field) => (
+              <div className="grid gap-1">
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  placeholder="Password"
+                  type="password"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  autoCorrect="off"
+                />
+                <FieldInfo field={field} />
+              </div>
+            )}
+          />
 
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button className="w-full" disabled={!canSubmit}>
-              {isSubmitting && <Loading />}
-              Sign In with Email
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+            children={([canSubmit, isSubmitting]) => (
+              <Button className="w-full" disabled={!canSubmit}>
+                {isSubmitting && <Loading />}
+                Sign In with Email
+              </Button>
+            )}
+          />
+        </div>
+
+        <div className="mt-5">
+          <ForgotPassword>
+            <Button
+              variant="link"
+              type="button"
+              className="text-sm text-blue-500 hover:underline text-center w-full"
+            >
+              Forgot Password?
             </Button>
-          )}
-        />
-      </div>
-    </form>
+          </ForgotPassword>
+
+          <div className="text-center">
+            Don't have an account?{' '}
+            <Link href="/register" className="font-bold text-blue-500">
+              Sign up
+            </Link>
+          </div>
+        </div>
+      </form>
+    </>
   );
 }
