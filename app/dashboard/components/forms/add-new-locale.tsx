@@ -130,9 +130,10 @@ export default function AddNewLocaleForm(props: {
       </div>
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
         <form.Subscribe
-          children={(field) => (
+          selector={(state) => [state.isSubmitting]}
+          children={([isSubmitting]) => (
             <Button type="submit">
-              {field.isSubmitting && <Loading />}
+              {isSubmitting && <Loading />}
               Add Locale
             </Button>
           )}

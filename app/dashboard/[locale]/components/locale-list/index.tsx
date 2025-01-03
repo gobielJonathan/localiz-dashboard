@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 
@@ -19,11 +17,6 @@ export default function LocaleList({
   dashboardId: number;
   locale: string;
 }) {
-  const [editedData, setEditedData] = useState<{
-    key: string;
-    content: string;
-  }>({ key: '', content: '' });
-
   const { data, isLoading } = useGetLocaleContent(dashboardId, String(locale));
 
   const columns: ColumnDef<NormalizedGetLocaleContent>[] = [

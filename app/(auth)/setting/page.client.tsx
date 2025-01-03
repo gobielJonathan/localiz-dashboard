@@ -48,24 +48,6 @@ export default function Client(props: { email: string; name: string }) {
     },
   });
 
-  const onResetPassword = async () => {
-    const [error] = await asyncTryCatch(() =>
-      fetcher('/api/user/reset-password/generate', {
-        method: 'POST',
-        body: JSON.stringify({ email: props.email }),
-      }),
-    );
-    if (error) {
-      toast.error(error.message, { position: 'top-right' });
-      return;
-    }
-
-    toast.success(
-      `Reset password email sent, please check ${props.email} inbox/spam folder`,
-      { position: 'top-right', duration: 3_000 },
-    );
-  };
-
   return (
     <>
       <Toaster />
@@ -119,19 +101,21 @@ export default function Client(props: { email: string; name: string }) {
           )}
         />
 
-        <Button
-          variant="link"
-          type="button"
-          onClick={onResetPassword}
-          className="text-sm text-blue-500 hover:underline"
-        >
-          Reset Password
-        </Button>
+        <Link href="/forget-password">
+          <Button
+            variant="link"
+            type="button"
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Reset Password
+          </Button>
+        </Link>
 
         <form.Subscribe
-          children={(field) => (
-            <Button disabled={!field.canSubmit}>
-              {field.isSubmitting && <Loading />}
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button disabled={!canSubmit}>
+              {isSubmitting && <Loading />}
               <span>Save</span>
             </Button>
           )}

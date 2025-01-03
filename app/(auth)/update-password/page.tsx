@@ -74,7 +74,8 @@ export default function UpdatePasswordPage() {
         <div className="mb-5">
           <h1 className="font-bold text-2xl">Reset Password</h1>
           <p className="text-gray-600 font-medium">
-            Enter your new password below.
+            Enter your new password below. Choose a strong password and don't
+            reuse it for other accounts
           </p>
         </div>
 
@@ -127,9 +128,10 @@ export default function UpdatePasswordPage() {
             )}
           />
           <form.Subscribe
-            children={(field) => (
+            selector={(state) => [state.isSubmitting]}
+            children={([isSubmitting]) => (
               <Button>
-                {field.isSubmitting && <Loading />}
+                {isSubmitting && <Loading />}
                 <span>Reset Password</span>
               </Button>
             )}

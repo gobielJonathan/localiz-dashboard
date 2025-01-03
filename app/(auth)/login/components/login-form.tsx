@@ -116,7 +116,7 @@ export default function LoginForm() {
         </div>
 
         <div className="mt-5">
-          <ForgotPassword>
+          <Link href="/forget-password" className="font-bold text-blue-500">
             <Button
               variant="link"
               type="button"
@@ -124,7 +124,7 @@ export default function LoginForm() {
             >
               Forgot Password?
             </Button>
-          </ForgotPassword>
+          </Link>
 
           <div className="text-center">
             Don't have an account?{' '}
