@@ -1,5 +1,7 @@
 'use client';
 
+import { Suspense } from 'react';
+
 import LoginForm from './components/login-form';
 
 export default function Client() {
@@ -14,7 +16,9 @@ export default function Client() {
         </p>
       </div>
       <div className="grid gap-6">
-        <LoginForm />
+        <Suspense>
+          <LoginForm />
+        </Suspense>
       </div>
     </>
   );
